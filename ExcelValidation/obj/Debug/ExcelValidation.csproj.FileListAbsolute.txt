@@ -1,0 +1,12 @@
+D:\DotNet\ExcelValidation\ExcelValidation\bin\Debug\ExcelValidation.exe.config
+D:\DotNet\ExcelValidation\ExcelValidation\bin\Debug\ExcelValidation.exe
+D:\DotNet\ExcelValidation\ExcelValidation\bin\Debug\ExcelValidation.pdb
+D:\DotNet\ExcelValidation\ExcelValidation\bin\Debug\DocumentFormat.OpenXml.dll
+D:\DotNet\ExcelValidation\ExcelValidation\bin\Debug\DocumentFormat.OpenXml.xml
+D:\DotNet\ExcelValidation\ExcelValidation\obj\Debug\ExcelValidation.csproj.AssemblyReference.cache
+D:\DotNet\ExcelValidation\ExcelValidation\obj\Debug\ExcelValidation.csproj.SuggestedBindingRedirects.cache
+D:\DotNet\ExcelValidation\ExcelValidation\obj\Debug\ExcelValidation.csproj.ResolveComReference.cache
+D:\DotNet\ExcelValidation\ExcelValidation\obj\Debug\ExcelValidation.csproj.CoreCompileInputs.cache
+D:\DotNet\ExcelValidation\ExcelValidation\obj\Debug\ExcelValidation.csproj.CopyComplete
+D:\DotNet\ExcelValidation\ExcelValidation\obj\Debug\ExcelValidation.exe
+D:\DotNet\ExcelValidation\ExcelValidation\obj\Debug\ExcelValidation.pdb
