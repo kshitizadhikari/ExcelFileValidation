@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DocumentFormat.OpenXml.Spreadsheet;
+using System.Data.SqlClient;
 
 namespace ExcelValidation
 {
@@ -11,36 +8,66 @@ namespace ExcelValidation
     {
         static void Main(string[] args)
         {
-            HashSet<string> emailHashSet = new HashSet<string>();
-            string[] result = new string[11];
-            Excel baseFile = new Excel(@"D:\DotNet\ExcelValidation\ExcelFile2.xlsx", 1);
-            Excel newFile = new Excel(@"D:\DotNet\ExcelValidation\Test1.xlsx", 1);
+            HashSet<string> dbEmailHashSet = new HashSet<string>();
+            List<string> excelEmailList = new List<string>();
+            Excel baseFile = new Excel(@"D:\DotNet\ExcelValidation\abc.xlsx", 1);
 
-            for (int i = 1; i <= 1; i++)
+            string connectionString = "Data Source=(localdb)\\MSSQLLocalDB;Server=DESKTOP-72AIJKL;Initial Catalog=EmailCheckDb;Integrated Security=True";
+            SqlConnection connection = new SqlConnection(connectionString);
+
+            try
             {
-                for (int j = 2; j < 10; j++)
-                {
-                    result[j] = baseFile.ReadCellsFromColumn(j, i);
-                    if (emailHashSet.Contains(result[j]))
-                    {
-                        newFile.WriteInCell(j, i, result[j]);
+                connection.Open();
+                Console.WriteLine("Connection established\n");
 
-                        newFile.WriteInCell(j, i+2, "duplicate");
-                    }
-                    else
+                string selectQuery = "SELECT email FROM Users"; // Adjust your SQL query as needed
+                SqlCommand command = new SqlCommand(selectQuery, connection);
+                SqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    string email = reader["email"].ToString();
+                    dbEmailHashSet.Add(email);
+                }
+                reader.Close();
+
+                for (int i = 1; i <= 1; i++)
+                {
+                    for (int j = 2; j < 10; j++)
                     {
-                        emailHashSet.Add(result[j]);
-                        newFile.WriteInCell(j,i, result[j]);
-                        newFile.WriteInCell(j, i+2, "valid");
+                        string cellValue = baseFile.ReadCellsFromColumn(j, i).ToString();
+                        if (dbEmailHashSet.Contains(cellValue))
+                        {
+                            baseFile.WriteInCell(j, i + 2, "duplicate");
+                            excelEmailList.Add(cellValue);
+                        }
                     }
                 }
+
+                baseFile.SaveWorkBook();
+
+                Console.WriteLine("Emails in Database :");
+                foreach (var email in dbEmailHashSet)
+                {
+                    Console.WriteLine(email);
+                }
+
+                Console.WriteLine("\nDuplicate Emails in Excel File :");
+                foreach (var email in excelEmailList)
+                {
+                    Console.WriteLine(email);
+                }
+
             }
-            newFile.SaveWorkBook();
-            baseFile.CloseFile();
-            foreach (var email in emailHashSet)
+            catch (SqlException ex)
             {
-                Console.WriteLine(email);
+                Console.WriteLine("Error connecting to the database. \n" + ex.Message);
             }
+            finally
+            {
+                connection.Close();
+            }
+
             Console.ReadLine();
         }
     }

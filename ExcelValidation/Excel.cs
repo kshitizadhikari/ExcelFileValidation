@@ -1,38 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DocumentFormat.OpenXml.Spreadsheet;
+using System.Runtime.InteropServices;
 using Microsoft.Office.Interop.Excel;
-using Workbook = Microsoft.Office.Interop.Excel.Workbook;
-using Worksheet = Microsoft.Office.Interop.Excel.Worksheet;
 
 namespace ExcelValidation
 {
-    public class Excel
+    public class Excel : IDisposable
     {
-        string path = "";
-        Application excel = new Application();
+        private Application excel;
         private Workbook wb;
         private Worksheet ws;
-        HashSet<string> emailHashSet = new HashSet<string>();
+
         public Excel(string path, int sheet)
         {
-            this.path = path;
-            wb = excel.Workbooks.Open(path);
-            ws = wb.Worksheets[sheet];
+            try
+            {
+                excel = new Application();
+                wb = excel.Workbooks.Open(path);
+                ws = (Worksheet)wb.Worksheets[sheet];
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error opening Excel file: {ex.Message}");
+            }
         }
 
         public string ReadCellsFromColumn(int i, int j)
         {
-            //i++;
-            //j++;
-
             if (ws.Cells[i, j].Value2 != null)
             {
-                return ws.Cells[i, j].Value2;
+                return ws.Cells[i, j].Value2.ToString();
             }
             else
             {
@@ -42,19 +38,44 @@ namespace ExcelValidation
 
         public void WriteInCell(int i, int j, string value)
         {
-
             ws.Cells[i, j].Value = value;
         }
 
         public void SaveWorkBook()
         {
-            wb.Save();
-            wb.Close();
+            try
+            {
+                wb.Save();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error saving Excel workbook: {ex.Message}");
+            }
+            finally
+            {
+                Dispose();
+            }
         }
 
-        public void CloseFile()
+        public void Dispose()
         {
-            wb.Close();
+            // Clean up resources
+            if (wb != null)
+            {
+                wb.Close();
+                Marshal.ReleaseComObject(wb);
+                wb = null;
+            }
+
+            if (excel != null)
+            {
+                excel.Quit();
+                Marshal.ReleaseComObject(excel);
+                excel = null;
+            }
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
     }
 }
