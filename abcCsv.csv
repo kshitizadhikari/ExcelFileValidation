@@ -1,5 +1,8 @@
-﻿Email,Phone,Validation
-anup@example.com,12345,duplicate
-pranav@gmail.com,32134,
-pranav@example.com,2323222,duplicate
-hero@gmail.com,323322,
+Email,Phone
+anup@example.com,,duplicate
+pranav@gmail.com,
+pranav@example.com,,duplicate
+hero@gmail.com,
+zero@gmail.com,
+kshitiz@example.com,,duplicate
+yaho@gmail.com,

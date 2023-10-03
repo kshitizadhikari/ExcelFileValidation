@@ -10,7 +10,7 @@ namespace ExcelValidation
         static void Main(string[] args)
         {
             HashSet<string> dbEmailHashSet = new HashSet<string>();
-            List<string> excelEmailList = new List<string>();
+            List<string> duplicateEmailList = new List<string>();
             int count = 0;
             int emailColumn = 1;
             char choice;
@@ -58,20 +58,14 @@ namespace ExcelValidation
                                 if (dbEmailHashSet.Contains(cellValue))
                                 {
                                     baseFile.WriteInCell(i, emailColumn + 2, "duplicate");
-                                    excelEmailList.Add(cellValue);
+                                    duplicateEmailList.Add(cellValue);
                                 }
                             }
 
                             baseFile.SaveWorkBook();
-
-                            Console.WriteLine("Emails in Database :");
-                            foreach (var email in dbEmailHashSet)
-                            {
-                                Console.WriteLine(email);
-                            }
-
-                            Console.WriteLine("\nDuplicate Emails in Excel File :");
-                            foreach (var email in excelEmailList)
+                           
+                            Console.WriteLine("\nDuplicate Emails in the Excel File are:");
+                            foreach (var email in duplicateEmailList)
                             {
                                 Console.WriteLine(email);
                             }
@@ -86,26 +80,48 @@ namespace ExcelValidation
 
                     case '2':
                         List<string> emailsInCsvFile = new List<string>();
-                        
+
                         Console.WriteLine("Please enter the absolute path along with the filename and extension that you want to use : ");
                         filePath = Console.ReadLine();
-
+                        string newLine;
                         if (System.IO.File.Exists(filePath))
                         {
-                            Console.WriteLine($"Selected File => {filePath}");
-                            StreamReader readerA = new StreamReader(filePath);
-                            while (!readerA.EndOfStream)
+                            using (StreamReader readerA = new StreamReader(filePath))
                             {
-                                string line = readerA.ReadLine();
-                                string[] values = line.Split(',');
-                                if (values.Length > 0)
+                                // Create a StreamWriter to write changes back to the file
+                                using (StreamWriter writer = new StreamWriter("temp.csv"))
                                 {
-                                    string email = values[0];
-                                    emailsInCsvFile.Add(email);
+                                    while (!readerA.EndOfStream)
+                                    {
+                                        string line = readerA.ReadLine();
+                                        string[] values = line.Split(',');
+
+                                        if (values.Length > 0)
+                                        {
+                                            string email = values[0];
+                                            if (dbEmailHashSet.Contains(email))
+                                            {
+                                                duplicateEmailList.Add(email);
+                                                values[2] = "duplicate";
+                                                newLine = string.Join(",", values); //new line out of bounds of array
+                                                writer.WriteLine(newLine);
+                                            }
+                                            else
+                                            {
+                                                newLine = $"{email},{values[1]}";
+                                                writer.WriteLine(newLine);
+                                            }
+                                            emailsInCsvFile.Add(email);
+                                        }
+                                    }
                                 }
                             }
 
-                            foreach (string email in emailsInCsvFile)
+                            File.Delete(filePath);
+                            File.Move("temp.csv", filePath);
+
+                            Console.WriteLine("\nDuplicate emails in the CSV file are :");
+                            foreach (string email in duplicateEmailList)
                             {
                                 Console.WriteLine(email);
                             }
@@ -115,7 +131,7 @@ namespace ExcelValidation
                             Console.WriteLine("The specified file path does not exist.");
                         }
 
-                       
+
 
                         break;
 
