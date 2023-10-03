@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IO;
 
 namespace ExcelValidation
 {
@@ -12,8 +13,8 @@ namespace ExcelValidation
             List<string> excelEmailList = new List<string>();
             int count = 0;
             int emailColumn = 1;
-            //Excel baseFile = new Excel(@"D:\DotNet\ExcelValidation\abc.xlsx", 1);
             char choice;
+            string filePath;
             string connectionString = "Data Source=(localdb)\\MSSQLLocalDB;Server=DESKTOP-72AIJKL;Initial Catalog=EmailCheckDb;Integrated Security=True";
             SqlConnection connection = new SqlConnection(connectionString);
 
@@ -43,9 +44,8 @@ namespace ExcelValidation
                 switch (choice)
                 {
                     case '1':
-
-                        Console.WriteLine("Please enter the path or the filename that you want to use : ");
-                        string filePath = Console.ReadLine();
+                        Console.WriteLine("Please enter the absolute path along with the filename and extension that you want to use : ");
+                        filePath = Console.ReadLine();
 
                         if (System.IO.File.Exists(filePath))
                         {
@@ -85,6 +85,38 @@ namespace ExcelValidation
                         break;
 
                     case '2':
+                        List<string> emailsInCsvFile = new List<string>();
+                        
+                        Console.WriteLine("Please enter the absolute path along with the filename and extension that you want to use : ");
+                        filePath = Console.ReadLine();
+
+                        if (System.IO.File.Exists(filePath))
+                        {
+                            Console.WriteLine($"Selected File => {filePath}");
+                            StreamReader readerA = new StreamReader(filePath);
+                            while (!readerA.EndOfStream)
+                            {
+                                string line = readerA.ReadLine();
+                                string[] values = line.Split(',');
+                                if (values.Length > 0)
+                                {
+                                    string email = values[0];
+                                    emailsInCsvFile.Add(email);
+                                }
+                            }
+
+                            foreach (string email in emailsInCsvFile)
+                            {
+                                Console.WriteLine(email);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("The specified file path does not exist.");
+                        }
+
+                       
+
                         break;
 
                     default:
